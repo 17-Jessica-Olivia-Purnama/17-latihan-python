@@ -1,0 +1,44 @@
+print ("===================================")
+
+#Fungsi untuk mengecek apakah sebuah angka ganjil atau genap
+def cek_ganjil_genap(angka):
+    if angka % 2 == 0:
+        return "Genap"
+    else:
+        return "Ganjil"
+
+# Contoh penggunaan:
+print(cek_ganjil_genap(10))  # Output: Genap
+print(cek_ganjil_genap(7))   # Output: Ganjil
+
+print("===================================")
+
+#Fungsi untuk mengecek apakah sebuah angka adalah bilangan prima
+import math
+
+def is_prime(n):
+    # Bilangan <= 1 bukan bilangan prima
+    if n <= 1:
+        return False
+    
+    # 2 adalah satu-satunya bilangan genap yang prima
+    if n == 2:
+        return True
+    
+    # Bilangan genap selain 2 pasti bukan prima
+    if n % 2 == 0:
+        return False
+    
+    # Cek faktor pembagi ganjil dari 3 hingga sqrt(n)
+    limit = int(math.isqrt(n))
+    for i in range(3, limit + 1, 2):
+        if n % i == 0:
+            return False
+            
+    return True
+
+# Contoh Penggunaan:
+print(is_prime(2))   # Output: True
+print(is_prime(17))  # Output: True
+print(is_prime(4))   # Output: False
+print(is_prime(1))   # Output: False
