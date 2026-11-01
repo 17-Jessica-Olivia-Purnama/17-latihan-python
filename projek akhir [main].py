@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, render_template  # <-- 1. Tambahkan render_template di sini
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -30,6 +30,14 @@ class Device(db.Model):
 # Inisialisasi Database
 with app.app_context():
     db.create_all()
+
+# ==========================================
+# 2. TARUH RUTE HALAMAN UTAMA DI SINI
+# ==========================================
+@app.route('/')
+def index():
+    return render_template('index.html')
+
 
 # Endpoint untuk mendapatkan SEMUA perangkat sekaligus
 @app.route('/api/devices', methods=['GET'])
